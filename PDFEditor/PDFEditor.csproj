@@ -7,7 +7,7 @@
     <ProjectGuid>{3E61FA88-2B5E-4EE1-8FB4-69701CB1AD94}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ConsoleApplication1</RootNamespace>
+    <RootNamespace>PDFEditor</RootNamespace>
     <AssemblyName>ConsoleApplication1</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
@@ -51,7 +51,7 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\PDFClown\dotNET\pdfclown.lib\pdfclown.lib.csproj">
+    <ProjectReference Include="..\pdfclown.lib\pdfclown.lib.csproj">
       <Project>{dbed0809-ee4c-45b0-92fa-e4789ecc2aec}</Project>
       <Name>pdfclown.lib</Name>
     </ProjectReference>
