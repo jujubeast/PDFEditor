@@ -98,8 +98,6 @@ namespace PDFEditor {
             composer.Flush();
         }
 
-       
-
         /**
       <summary>Executes the sample.</summary>
       <returns>Whether the sample has been completed.</returns>
