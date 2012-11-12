@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PDFEditor", "PDFEditor\PDFEditor.csproj", "{3E61FA88-2B5E-4EE1-8FB4-69701CB1AD94}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "pdfclown.lib", "pdfclown.lib\pdfclown.lib.csproj", "{DBED0809-EE4C-45B0-92FA-E4789ECC2AEC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "pdfclown.lib", "..\PDFClown\dotNET\pdfclown.lib\pdfclown.lib.csproj", "{DBED0809-EE4C-45B0-92FA-E4789ECC2AEC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -1,6 +1,4 @@
-﻿using bytes = org.pdfclown.bytes;
-using org.pdfclown.documents;
-using org.pdfclown.documents.interaction;
+﻿using org.pdfclown.documents;
 using org.pdfclown.documents.interchange.metadata;
 using org.pdfclown.documents.interaction.viewer;
 using files = org.pdfclown.files;
@@ -11,19 +9,12 @@ using org.pdfclown.tools;
 using org.pdfclown.documents.interaction.annotations;
 using org.pdfclown.util.math;
 using org.pdfclown.util.math.geom;
-using org.pdfclown.tokens;
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Collections;
 using System.Drawing;
 using System.Text.RegularExpressions;
-using System.IO;
-
-
 
 namespace PDFEditor {
     /**
@@ -54,7 +45,12 @@ namespace PDFEditor {
             //fill in later!
         }
 
+        /**
+          <summary>Highlights texts matching the pattern within entire pdf</summary>
+          <param name="pattern">Pattern to highlight in pdf</param>
+        */
         public void HighlightPattern(Regex pattern) {
+
             TextExtractor textExtractor = new TextExtractor(false, true);
             foreach (Page page in this.file.Document.Pages) {
 
@@ -63,18 +59,34 @@ namespace PDFEditor {
                 // 2.1. Extract the page text!
                 IDictionary<RectangleF?, IList<ITextString>> textStrings = textExtractor.Extract(page);
 
-                string test = TextExtractor.ToString(textStrings);
-                //test = test.Replace(" ", string.Empty);
-
                 // 2.2. Find the text pattern matches!
-                MatchCollection matches = pattern.Matches(test);
-               
+                MatchCollection matches = pattern.Matches(TextExtractor.ToString(textStrings));
+
                 // 2.3. Highlight the text pattern matches!
                 textExtractor.Filter(textStrings, new TextHighlighter(page, matches));
             }
-            //file.istream.Dispose();
-            //file.Save, files.SerializationModeEnum.Incremental);
-            Serialize(file, false);
+            Serialize(file);
+        }
+
+        public IDictionary<int,Page> getPage() {
+            TextExtractor textExtractor = new TextExtractor(false, true);
+            IDictionary<int, Page> dict = new Dictionary<int, Page>();
+            foreach (Page page in this.file.Document.Pages) {
+
+                Console.WriteLine("\nScanning page " + (page.Index + 1) + "...\n");
+
+                // 2.1. Extract the page text!
+                IDictionary<RectangleF?, IList<ITextString>> textStrings = textExtractor.Extract(page);
+         
+                int page_number;
+                foreach (IList<ITextString> ss in textStrings.Values) {
+                    int.TryParse(ss[ss.Count - 1].Text, out page_number);
+                    dict.Add(page_number, page);
+                }
+                //String s = TextExtractor.ToString(textStrings);
+                //Console.Write("done");
+            }
+            return dict;
         }
 
         public void Populate(string output, StandardType1Font font_type, int font_size) {
@@ -100,12 +112,6 @@ namespace PDFEditor {
             // 4. Flush the contents into the page!
             composer.Flush();
         }
-
-        /**
-      <summary>Executes the sample.</summary>
-      <returns>Whether the sample has been completed.</returns>
-    */
-        //public abstract bool Run();
         #endregion
 
         #region protected
@@ -128,76 +134,23 @@ namespace PDFEditor {
         /**
           <summary>Serializes the given PDF Clown file object.</summary>
           <param name="file">File to serialize.</param>
+          <param name="chooseMode">Whether to allow user choice of serialization mode.</param>
         */
         protected void Serialize(files::File file) {
-            Serialize(file, true);
-        }
-
-        /**
-          <summary>Serializes the given PDF Clown file object.</summary>
-          <param name="file">File to serialize.</param>
-          <param name="chooseMode">Whether to allow user choice of serialization mode.</param>
-        */
-        protected void Serialize(files::File file, bool chooseMode) {
-            Serialize(file, chooseMode, null, null);
-        }
-
-        /**
-          <summary>Serializes the given PDF Clown file object.</summary>
-          <param name="file">File to serialize.</param>
-          <param name="chooseMode">Whether to allow user choice of serialization mode.</param>
-          <param name="title">Document title.</param>
-          <param name="subject">Document subject.</param>
-        */
-        protected void Serialize(files::File file, bool chooseMode, string title, string subject) {
-            Serialize(file, GetType().Name, chooseMode, title, subject);
-        }
-
-        /**
-          <summary>Serializes the given PDF Clown file object.</summary>
-          <param name="file">File to serialize.</param>
-          <param name="fileName">Output file name.</param>
-          <param name="chooseMode">Whether to allow user choice of serialization mode.</param>
-          <param name="title">Document title.</param>
-          <param name="subject">Document subject.</param>
-        */
-        protected void Serialize(files::File file, string fileName, bool chooseMode, string title, string subject) {
-            ApplyDocumentSettings(file.Document, title, subject);
-
-            Console.WriteLine();
-            files::SerializationModeEnum serializationMode = files::SerializationModeEnum.Incremental;
-            if (chooseMode) {
-                Console.WriteLine("[0] Standard serialization");
-                Console.WriteLine("[1] Incremental update");
-                Console.Write("Please select a serialization mode: ");
-                try {
-                    serializationMode = (files::SerializationModeEnum)Int32.Parse(Console.ReadLine());
-                }
-                catch {/* Default. */
-                }
-            }
-            string outputFilePath;
-            if (outputPath==null) {
-                outputFilePath = outputPath;
-            }
-            else {
-                outputFilePath = outputPath + fileName + "." + serializationMode + ".pdf";
-            }
-
-            // Save the file!
-            /*
-              NOTE: You can also save to a generic target stream (see Save() method overloads).
-            */
+            //ApplyDocumentSettings(file.Document, title, subject);
             try {
-                //file.Reader.Dispose();
-                 
-                file.Save(outputFilePath, serializationMode);
+                file.Save();        //save file to temporary location
+                file.Dispose();     //dispose original file and replace with file in temp location
+                
+                //set up the file object for new document
+                files.File f = new files.File(inputPath);   
+                this.file = f;
             }
             catch (Exception e) {
                 Console.WriteLine("File writing failed: " + e.Message);
                 Console.WriteLine(e.StackTrace);
             }
-            Console.WriteLine("\nOutput: " + outputFilePath);
+            Console.WriteLine("\nOutput: " + this.inputPath + ".tmp");
         }
         #endregion
 
@@ -264,7 +217,7 @@ namespace PDFEditor {
                     }
                     highlightQuads.Add(Quad.Get(textBox.Value));
                 }
-                
+
 
                 // Highlight text pattern by quads one by one.
                 foreach (Quad q in highlightQuads) {

@@ -43,15 +43,15 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Utils.cs" />
-    <Compile Include="Sample.cs" />
-    <Compile Include="Program.cs" />
+    <Compile Include="PDFEditor.cs" />
+    <Compile Include="Demo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\pdfclown.lib\pdfclown.lib.csproj">
+    <ProjectReference Include="..\..\PDFClown\dotNET\pdfclown.lib\pdfclown.lib.csproj">
       <Project>{dbed0809-ee4c-45b0-92fa-e4789ecc2aec}</Project>
       <Name>pdfclown.lib</Name>
     </ProjectReference>
